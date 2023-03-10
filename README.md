@@ -1,4 +1,4 @@
-This is the code used to produce the results of the paper: TODO
+This is the code used to produce the results of the paper: [Statistical mechanics of the maximum-average submatrix problem](https://arxiv.org/abs/2303.05237)
 
 # Requirements
 
@@ -12,10 +12,10 @@ The plots were generated using a [Jupyter](https://jupyter.org) notebook and the
 
 # The dataset
 
-```data.csv``` contains all data used in the analysis and in the generation of the figures.
+```m_less_0.1.csv``` and ```m_great_0.1.csv``` contain all data used in the analysis and in the generation of the figures.
 Each line contains the following fields
 
-    type                # M denotes finite m, S small m, see sections below      
+    type                # finte M / small M     
     beta                # inverse temperature     
     m                   # magnetization 
     h                   # magnetic field
@@ -36,16 +36,30 @@ Each line contains the following fields
     replicon_p1         # type-I 1-RSB stability at p=1 (stable if positive)          
     entropy_p           # total entropy at p=1          
 
-The data can be checked by rerunning the SP solver initialized at each lines values of the parameters
+The data can be checked by rerunning the SP solver initialized at each lines values of the parameters.
+```data_processed.csv``` contains the data cleaned and processed, with the following fields
+
+    type                # M denotes finite m, S small m, see sections below      
+    beta                # inverse temperature     
+    m                   # magnetization 
+    h                   # magnetic field
+    q0                  # overlap 0  
+    q1                  # overlap 1  
+    p1                  # Parisi parameter 
+    err                 # max between the xerr and rerr, see below  
+    complexity_p1       # complexity at p=1
+    average             # submatrix-average 
+    replicon            # type-I 1-RSB stability (stable if positive) 
+    entropy             # total entropy 
+    computed_m          # cross check that the obtained value of h produces the correct magnetisation
 
 # Generating figures 
 
-The figures are generated from ```data.csv``` in the ```figures.ipynb``` Jupyter notebook.
+The figures are generated from ```data_processed.csv``` in the ```analysis.ipynb``` Jupyter notebook.
 
 # Generating data
 
-We do not provide a unified script to perform the data generation as the data was generated in multiple different occasions, and in general it requires a fair amount of human supervision. 
-We list all ingredients needed, so that writing one's own routines should be easy.
+The data is generated from in the ```analysis.ipynb``` Jupyter notebook, we provide good starting conditions for the solver for many values of $m$.
 
 ## Saddle point equation solver
 
@@ -89,19 +103,6 @@ To generate the data for finite $m$, we first find an inverse temperature $\beta
 Then, fix $\beta_1 = \beta_0 + \beta_{\rm step}$ for some small step $\beta_{\rm step}$ (for example 0.1), and solve the SP equations at $\beta_1$ using the solution at $\beta_0$ as initialization.
 Repeat up (or down) to the desired inverse temperature.
 
-A good set of starting inverse temperatures is 
-
-    [m, beta]
-    [0.1, 30.]
-    [0.2, 22.]
-    [0.3, 18.]
-    [0.4, 15.]
-    [0.5, 15.]
-    [0.6, 15.]
-    [0.7, 20.] 
-    [0.8, 22.]
-    [0.9, 35.]
-
 ## Small magnetization
 
 To simulate data at small $m$ and $Σ(p) = 0$, use the initialization 
@@ -120,22 +121,12 @@ while for $p=1$ use
     init_q1 = 0.999 * m
     init_p1 = 1.
 
-Then, after finding a fist solution at intensive beta = 2.5, use the same stepping procedure as that described in the previous section.
-It is particularly important to simulate the first SP equations at any $m$ at intensivebeta ~ 2.5
+Then, after finding a fist solution at intensive beta = 2.1, use the same stepping procedure as that described in the previous section.
+It is particularly important to simulate the first SP equations at any $m$ at intensivebeta ~ 2.1
 and then descend in intensive inverse temperature very slowly into the region of positive complexity. 
 Indeed, the SP equations are very delicate in that region, and tend to default quickly to the RS solution.
 
 These scalings allows to see the rich phase diagram for 1. < intensivebeta < 4.
-
-## Saving data
-
-The data was then appended into a simple dataframe generated with 
-
-    DataFrame( type=String[], beta=Float64[], h=Float64[], m=Float64[], q0=Float64[], q1=Float64[], p1=Float64[], err=Float64[])
-
-in which err = max(rerr, xerr), and saved as a CSV file using
-
-    CSV.write(database_file, database)
 
 ## Observables 
 
@@ -148,20 +139,7 @@ The following observables can be computed
     RSB1_complexity(beta, h, m, q0, q1, p1)
     RSB1_replicon(beta, h, m, q0, q1, p1)
 
-It can be useful to lower the number of points used in the Gauss-Hermite integration when computing the observables. 
-To do this, modify the number in thir definition
-
-    const xGauss = gausshermite(201)[1]
-    const wGauss = gausshermite(201)[2]
-
-See the ```FastGaussQuadrature.jl``` package [documentation](https://juliaapproximation.github.io/FastGaussQuadrature.jl/stable/) for more details.
-
 # RS
 
 The code provides also a RS solver. 
 It works very similarly to the 1-RSB solver, so refer to the sections above for the "documentation".
-
-# Testing
-
-A very barebones testing file ```test.jl``` is provided. 
-It was used during development mainly to check that known numerical solutions of the saddle point equations obtained with other codebases were found back by this algorithm.
