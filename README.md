@@ -2,13 +2,10 @@ This is the code used to produce the results of the paper: [Statistical mechanic
 
 # Requirements
 
-The data were generated using [Julia](https://julialang.org) version 1.8.5 and the following packages 
-
-    FastGaussQuadrature, LinearAlgebra, Roots, LogExpFunctions, DataFrames, CSV, IJulia
-
-The plots were generated using a [Jupyter](https://jupyter.org) notebook and the packages
+The data and plots were generated using a [Jupyter](https://jupyter.org) notebook and the packages
 
     LinearAlgebra
+    IJulia v1.24.0
     Plots v1.38.4
     FastGaussQuadrature v0.5.0
     Roots v2.0.8
