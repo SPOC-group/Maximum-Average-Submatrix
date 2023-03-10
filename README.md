@@ -8,7 +8,14 @@ The data were generated using [Julia](https://julialang.org) version 1.8.5 and t
 
 The plots were generated using a [Jupyter](https://jupyter.org) notebook and the packages
 
-    Plots, ???
+    LinearAlgebra
+    Plots v1.38.4
+    FastGaussQuadrature v0.5.0
+    Roots v2.0.8
+    LogExpFunctions v0.3.21
+    CSV v0.10.9
+    DataFrames v1.4.4
+    LinearRegression v0.2.1
 
 # The dataset
 
